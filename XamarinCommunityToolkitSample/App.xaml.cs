@@ -42,7 +42,7 @@ namespace XamarinCommunityToolkitSample
 
             double MinValue { get; set; } = 0;
 
-            double MaxValue { get; set; } = .5;
+            double MaxValue { get; set; } = 1;
 
             Frame Track { get; } = new Frame
             {
@@ -58,16 +58,22 @@ namespace XamarinCommunityToolkitSample
                 BackgroundColor = Color.LightSkyBlue
             };
 
-            Frame MinThumb { get; } = new Frame
+            ContentView MinThumb { get; } = new ContentView
             {
-                Padding = 0,
-                BackgroundColor = Color.White,
+                Content = new Frame
+                {
+                    Padding = 0,
+                    BackgroundColor = Color.White,
+                }
             };
 
-            Frame MaxThumb { get; } = new Frame
+            ContentView MaxThumb { get; } = new ContentView
             {
-                Padding = 0,
-                BackgroundColor = Color.White,
+                Content = new Frame
+                {
+                    Padding = 0,
+                    BackgroundColor = Color.White,
+                }
             };
 
             public RangeSelectorLayout()
@@ -97,16 +103,19 @@ namespace XamarinCommunityToolkitSample
 
                 Track.CornerRadius = trackRadius;
                 SelectedTrack.CornerRadius = trackRadius;
-                MinThumb.CornerRadius = thumbRadius;
-                MaxThumb.CornerRadius = thumbRadius;
+                ((Frame)MinThumb.Content).CornerRadius = thumbRadius;
+                ((Frame)MaxThumb.Content).CornerRadius = thumbRadius;
 
                 var minValue = MinValue * width;
                 var maxValue = MaxValue * width;
 
                 SetLayoutBounds(Track, new Rectangle(0, .5, width, trackHeight));
                 SetLayoutBounds(SelectedTrack, new Rectangle(minValue, .5, maxValue - minValue, trackHeight));
-                SetLayoutBounds(MinThumb, new Rectangle(minValue, .5, thumbSize, thumbSize));
-                SetLayoutBounds(MaxThumb, new Rectangle(maxValue, .5, thumbSize, thumbSize));
+                SetLayoutBounds(MinThumb, new Rectangle(0, .5, thumbSize, thumbSize));
+                SetLayoutBounds(MaxThumb, new Rectangle(0, .5, thumbSize, thumbSize));
+
+                MinThumb.TranslationX = minValue;
+                MaxThumb.TranslationX = maxValue;
             }
 
             protected override void OnParentSet()
@@ -123,8 +132,8 @@ namespace XamarinCommunityToolkitSample
 
             void AddChild(View view)
             {
-                SetLayoutFlags(view, AbsoluteLayoutFlags.YProportional);
                 Children.Add(view);
+                SetLayoutFlags(view, AbsoluteLayoutFlags.YProportional);
             }
 
             void AddGesture(View view)
@@ -155,13 +164,10 @@ namespace XamarinCommunityToolkitSample
             }
 
             void OnPanStarted(View view)
-                => thumbPositionMap[view] = GetLayoutBounds(view).X;
+                => thumbPositionMap[view] = view.TranslationX;
 
             void OnPanRunning(View view, double value)
-            {
-                SetValue(view, value + thumbPositionMap[view]);
-                UpdateLayot();
-            }
+                => SetValue(view, value + thumbPositionMap[view]);
 
             void OnPanCompleted(View view)
             {
@@ -170,15 +176,15 @@ namespace XamarinCommunityToolkitSample
             void OnPanCanceled(View view)
                 => SetValue(view, thumbPositionMap[view]);
 
-            void SetValue(View view, double value)
+            void SetValue(View view, double position)
             {
-                value /= Width;
+                var value = position / Width;
                 if (view == MinThumb)
-                {
                     MinValue = value;
-                    return;
-                }
-                MaxValue = value;
+                else
+                    MaxValue = value;
+
+                UpdateLayot();
             }
         }
     }
