@@ -6,7 +6,7 @@ namespace Xamarin.CommunityToolkit.Actions.Snackbar.Helpers.iOS.SnackbarViews
 	class MessageSnackbarView : BaseSnackbarView
 	{
 		public MessageSnackbarView(IOSSnackBar snackbar)
-            : base(snackbar)
+			: base(snackbar)
 		{
 		}
 
