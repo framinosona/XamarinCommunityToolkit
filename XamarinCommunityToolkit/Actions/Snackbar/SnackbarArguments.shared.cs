@@ -8,7 +8,7 @@ namespace Xamarin.CommunityToolkit.Actions.Snackbar
 	public class SnackbarArguments : ActionArguments
 	{
 		public SnackbarArguments(string message, int duration, string actionButtonText, Func<Task> action)
-            : base(message, duration)
+			: base(message, duration)
 		{
 			ActionButtonText = actionButtonText;
 			Action = action;
